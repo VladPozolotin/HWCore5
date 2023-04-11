@@ -2,7 +2,6 @@ package main.java;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import org.json.simple.JSONObject;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -55,6 +54,7 @@ public class Basket {
             System.out.println(ex.getMessage());
         }
     }
+
     public void saveJSON(File JSONfile, Basket basket) throws IOException {
         GsonBuilder build = new GsonBuilder();
         Gson gson = build.create();
@@ -100,13 +100,13 @@ public class Basket {
         }
         return null;
     }
+
     public static Basket loadFromJSON(File JSONfile) {
         Gson gson = new Gson();
         try {
             FileReader in = new FileReader(JSONfile);
             BufferedReader reader = new BufferedReader(in);
-            Basket basket = gson.fromJson(reader, Basket.class);
-            return basket;
+            return gson.fromJson(reader, Basket.class);
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
         }
