@@ -5,17 +5,19 @@ import java.io.IOException;
 import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         String[] products = {"Хлеб", "Молоко", "Печенье"};
         int[] prices = {50, 70, 60};
         int cartSum = 0;
-        File basket = new File("basket.txt");
-        Basket cart = Basket.loadFromTxtFile(basket);
+        File basket = new File("basket.json");
+        File logFile = new File("log.csv");
+        ClientLog log = new ClientLog();
+        Basket cart = Basket.loadFromJSON(basket);
         if (cart == null) {
             cart = new Basket(products, prices);
         } else {
-            for (String product : products){
-                cartSum = cartSum + (cart.getPrice(product)*cart.getCount(product));
+            for (String product : products) {
+                cartSum = cartSum + (cart.getPrice(product) * cart.getCount(product));
             }
         }
         System.out.println("Ассортимент:");
@@ -28,6 +30,7 @@ public class Main {
             String input = scanner.nextLine();
             if ("end".equals(input)) {
                 System.out.println("Ваша корзина:");
+                log.exportAsCSV(logFile);
                 break;
             }
             String[] fields = input.split(" ");
@@ -43,7 +46,8 @@ public class Main {
                         System.out.println("Некорректное количество товара.");
                     } else {
                         cart.addToCart(itemNum, itemCount);
-                        cart.saveTxt(basket);
+                        log.log(Integer.parseInt(fields[0]), itemCount);
+                        cart.saveJSON(basket, cart);
                         int itemPrice = prices[itemNum];
                         cartSum += (itemPrice * itemCount);
                     }
@@ -56,7 +60,7 @@ public class Main {
             System.out.println("Пусто");
         } else {
             cart.printCart();
-            }
+        }
         System.out.println("Итого: " + cartSum + " руб.");
     }
 }

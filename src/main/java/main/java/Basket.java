@@ -1,15 +1,15 @@
 package main.java;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintWriter;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import org.json.simple.JSONObject;
+
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.io.BufferedReader;
 
 public class Basket {
     protected List<String> products;
@@ -37,8 +37,9 @@ public class Basket {
             }
         }
     }
+
     public void saveTxt(File textFile) throws IOException {
-        try (PrintWriter out = new PrintWriter(textFile)){
+        try (PrintWriter out = new PrintWriter(textFile)) {
             for (String product : this.products) {
                 out.print(product + " ");
             }
@@ -54,14 +55,26 @@ public class Basket {
             System.out.println(ex.getMessage());
         }
     }
-    public int getPrice (String product){
+    public void saveJSON(File JSONfile, Basket basket) throws IOException {
+        GsonBuilder build = new GsonBuilder();
+        Gson gson = build.create();
+        try (FileWriter file = new FileWriter(JSONfile)) {
+            gson.toJson(basket, file);
+            file.flush();
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+        }
+    }
+
+    public int getPrice(String product) {
         return this.prices.get(this.products.indexOf(product));
     }
-    public int getCount (String product){
+
+    public int getCount(String product) {
         return this.basket.get(product);
     }
 
-    public static Basket loadFromTxtFile(File textFile){
+    public static Basket loadFromTxtFile(File textFile) {
         try {
             FileReader in = new FileReader(textFile);
             BufferedReader reader = new BufferedReader(in);
@@ -82,7 +95,19 @@ public class Basket {
                 basket.addToCart(i, count[i]);
             }
             return basket;
-            } catch (IOException ex) {
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+        }
+        return null;
+    }
+    public static Basket loadFromJSON(File JSONfile) {
+        Gson gson = new Gson();
+        try {
+            FileReader in = new FileReader(JSONfile);
+            BufferedReader reader = new BufferedReader(in);
+            Basket basket = gson.fromJson(reader, Basket.class);
+            return basket;
+        } catch (IOException ex) {
             System.out.println(ex.getMessage());
         }
         return null;
